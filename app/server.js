@@ -6,9 +6,14 @@
  * expects it to FAIL, which proves the tests detect the vulnerabilities they claim to.
  */
 const crypto = require('node:crypto');
+const fs = require('node:fs');
 const path = require('node:path');
 const express = require('express');
 const db = require('./data');
+
+// Optional local settings (PORT, VULNERABLE): copy .env.example to .env. Already-set variables win.
+const envFile = path.join(__dirname, '..', '.env');
+if (fs.existsSync(envFile)) process.loadEnvFile(envFile);
 
 const VULNERABLE = process.env.VULNERABLE === '1';
 const PORT = Number(process.env.PORT || 3210);

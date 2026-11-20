@@ -1,6 +1,10 @@
+import { existsSync } from 'node:fs';
 import { defineConfig, devices } from '@playwright/test';
 
-const PORT = 3210;
+// Optional local settings: copy .env.example to .env. Empty values fall back to the defaults.
+if (existsSync('.env')) process.loadEnvFile('.env');
+
+const PORT = Number(process.env.PORT || 3210);
 const VULNERABLE = process.env.VULNERABLE === '1';
 
 export default defineConfig({

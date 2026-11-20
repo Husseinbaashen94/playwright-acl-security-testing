@@ -92,18 +92,64 @@ CSP (no `unsafe-inline` / `unsafe-eval`), `X-Frame-Options`, `nosniff`, `Referre
 - **Dedicated accounts for destructive checks.** Lockout and role-change tests use their own users, so they can't break other tests.
 - **Tests of the tests.** `verify-detection.mjs` maps each planted flaw to the tests that must catch it.
 
-## Run it
+## Getting started
 
-Requires Node.js 18+.
+### 1. Prerequisites
+
+| Tool | Version | Check | Install |
+|------|---------|-------|---------|
+| Node.js | 20.12 or newer (22 LTS recommended) | `node -v` | [nodejs.org](https://nodejs.org/) |
+| Git | any recent | `git --version` | [git-scm.com](https://git-scm.com/downloads) |
+
+Nothing else is needed: the app under test (TeamNotes) ships in this repo and starts automatically.
+
+### 2. Clone and install
 
 ```bash
+git clone https://github.com/Husseinbaashen94/playwright-acl-security-testing.git
+cd playwright-acl-security-testing
 npm install
-npx playwright install chromium
-npm test                    # starts TeamNotes automatically, runs all 85 tests
-npm run verify:detection    # proves the suite catches all 18 planted vulnerabilities
-npm start                   # run the app on http://localhost:3210 (password: Passw0rd!)
-npm run start:vulnerable    # …or the vulnerable build
+npx playwright install --with-deps chromium
 ```
+
+### 3. Configure (optional)
+
+Everything works out of the box. To change a setting, copy the template and fill in only what you need:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Purpose and default |
+|----------|---------------------|
+| `PORT` | Port for the bundled TeamNotes app. Default `3210` |
+| `VULNERABLE` | `1` starts the app with its 18 planted vulnerabilities. Default: empty, which means secure |
+
+Empty values use the default. `.env` is git-ignored, so nothing you put in it is ever committed.
+
+### 4. Run the tests
+
+```bash
+npm test                    # starts TeamNotes, runs all 85 tests, stops it
+npm run verify:detection    # runs against the vulnerable build and checks all 18 flaws are caught
+npx playwright test --project=api   # API tests only
+npx playwright test --project=ui    # browser tests only
+npm run typecheck
+```
+
+To explore the app by hand, run `npm start` and open http://localhost:3210. Log in as `alice` (admin), `bob` (manager) or `carol` (member) with password `Passw0rd!`. Use `npm run start:vulnerable` for the flawed build.
+
+### 5. View the report
+
+Run `npm run report` to open the HTML report. Failed tests keep a full trace.
+
+### Troubleshooting
+
+| Problem | Fix |
+|---------|-----|
+| `Port 3210 is already in use` | Stop the other process, or set `PORT` in `.env` |
+| `Executable doesn't exist` | Run `npx playwright install --with-deps chromium` |
+| Many tests fail unexpectedly | Check `.env` doesn't set `VULNERABLE=1` |
 
 ## Project structure
 
